@@ -29,6 +29,19 @@ class Transaction {
     };
   }
 
+  updateTransaction({ senderWallet, amount, recipient }) {
+    if (amount > this.outputMap[senderWallet.publicKey])
+      throw new Error("Amount exceeds current balance!");
+
+    if(this.outputMap[recipient])
+      this.outputMap[recipient] += amount;
+    else
+      this.outputMap[recipient] = amount;
+      
+    this.outputMap[senderWallet.publicKey] -= amount;
+    this.transactionData = this.transactionDataGenerator({ senderWallet });
+  }
+
   static validateTransaction(transaction) {
     const {
       transactionData: { address, amount, signature },
@@ -43,7 +56,7 @@ class Transaction {
     );
 
     if (amount != totalAmount) {
-      console.log(amount);
+      //   console.log(amount);
       return false;
     }
 

@@ -3,7 +3,7 @@ const cryptoHash = require("./crypto_hash");
 describe("cryptoHash()", () => {
   it("returns a correct hash", () => {
     expect(cryptoHash("foobar")).toEqual(
-      "c3ab8ff13720e8ad9047dd39466b3c8974e592c2fa383d4a3960714caef0c4f2"
+      "a61deaef26c069e32bda388991cf1f07f0a6dd451bc6a7bdad3e34eecbbadb39"
     );
   });
 
