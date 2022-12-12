@@ -75,9 +75,9 @@ describe("Block", () => {
     });
 
     it("generates a hash correct wrt difficulty", () => {
-      expect(hexToBinary(minedBlock.hash).substring(0, minedBlock.difficulty)).toEqual(
-        "0".repeat(minedBlock.difficulty)
-      );
+      expect(
+        hexToBinary(minedBlock.hash).substring(0, minedBlock.difficulty)
+      ).toEqual("0".repeat(minedBlock.difficulty));
     });
 
     it("calls the adjustDifficulty()", () => {

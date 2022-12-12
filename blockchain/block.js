@@ -25,9 +25,11 @@ class Block {
     do {
       timestamp = Date.now();
       nonce++;
-      difficulty = Block.adjustDifficulty({block: lastBlock, timestamp});
+      difficulty = Block.adjustDifficulty({ block: lastBlock, timestamp });
       hash = cryptoHash(timestamp, lastHash, data, nonce, difficulty);
-    } while (hexToBinary(hash).substring(0, difficulty) !== "0".repeat(difficulty));
+    } while (
+      hexToBinary(hash).substring(0, difficulty) !== "0".repeat(difficulty)
+    );
 
     return new this({
       timestamp,
@@ -39,14 +41,11 @@ class Block {
     });
   };
 
-  static adjustDifficulty( {block, timestamp} ) {
+  static adjustDifficulty({ block, timestamp }) {
+    if (block.difficulty < 1) return 1;
 
-    if(block.difficulty < 1)
-      return 1;
+    if (timestamp - block.timestamp > MINE_RATE) return block.difficulty - 1;
 
-    if(timestamp - block.timestamp > MINE_RATE)
-      return block.difficulty - 1;
-      
     return block.difficulty + 1;
   }
 }

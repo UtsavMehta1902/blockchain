@@ -39,26 +39,34 @@ describe("Blockchain", () => {
       });
 
       it("returns false when lastHash value is changed", () => {
-        blockchain.chain[1].lastHash = 'kdnjei';
+        blockchain.chain[1].lastHash = "kdnjei";
 
         expect(Blockchain.isValidChain(blockchain.chain)).toBe(false);
       });
 
       it("returns false when intermediate data is changed", () => {
-        blockchain.chain[1].data = 'asafkpv';
+        blockchain.chain[1].data = "asafkpv";
 
         expect(Blockchain.isValidChain(blockchain.chain)).toBe(false);
       });
 
       it("returns false when it encounters difficulty jumps", () => {
         const timestamp = Date.now();
-        const lastHash = blockchain.chain[blockchain.chain.length-1].hash;
+        const lastHash = blockchain.chain[blockchain.chain.length - 1].hash;
         const nonce = 0;
         const data = [];
-        const difficulty = blockchain.chain[blockchain.chain.length-1].difficulty - 3;
+        const difficulty =
+          blockchain.chain[blockchain.chain.length - 1].difficulty - 3;
         const hash = cryptoHash(timestamp, lastHash, data, nonce, difficulty);
 
-        const newBlock = new Block({timestamp, lastHash, hash, data, nonce, difficulty});
+        const newBlock = new Block({
+          timestamp,
+          lastHash,
+          hash,
+          data,
+          nonce,
+          difficulty,
+        });
 
         blockchain.chain.push(newBlock);
 
@@ -71,39 +79,38 @@ describe("Blockchain", () => {
     });
   });
 
-  describe('updateChain()', () => {
-    describe('when the new chain is not longer', () => {
-        it('does not update the original chain', () => {
-            const origChain = blockchain.chain;
-            newChain.chain[0].data = 'fake-data';
+  describe("updateChain()", () => {
+    describe("when the new chain is not longer", () => {
+      it("does not update the original chain", () => {
+        const origChain = blockchain.chain;
+        newChain.chain[0].data = "fake-data";
 
-            blockchain.updateChain(newChain.chain);
-            expect(blockchain.chain).toEqual(origChain);
-        });
+        blockchain.updateChain(newChain.chain);
+        expect(blockchain.chain).toEqual(origChain);
+      });
     });
 
-    describe('when the new chain is longer', () => {
-        beforeEach(() => {
-            newChain.addBlock({ data: "bar" });
-            newChain.addBlock({ data: "foo-bar" });
-            newChain.addBlock({ data: "foo" });
-          });
+    describe("when the new chain is longer", () => {
+      beforeEach(() => {
+        newChain.addBlock({ data: "bar" });
+        newChain.addBlock({ data: "foo-bar" });
+        newChain.addBlock({ data: "foo" });
+      });
 
-        describe('when the new chain is invalid', () => {
+      describe("when the new chain is invalid", () => {
+        it("does not update the original chain", () => {
+          const origChain = blockchain.chain;
+          newChain.chain[2].hash = "noenov";
 
-            it('does not update the original chain', () => {
-                const origChain = blockchain.chain;
-                newChain.chain[2].hash = 'noenov';
+          blockchain.updateChain(newChain.chain);
+          expect(blockchain.chain).toEqual(origChain);
+        });
 
-                blockchain.updateChain(newChain.chain);
-                expect(blockchain.chain).toEqual(origChain);
-            });
-
-            it('replaces when the original chain is valid', () => {
-                blockchain.updateChain(newChain.chain);
-                expect(blockchain.chain).toEqual(newChain.chain);
-            });
-        });    
+        it("replaces when the original chain is valid", () => {
+          blockchain.updateChain(newChain.chain);
+          expect(blockchain.chain).toEqual(newChain.chain);
+        });
+      });
     });
   });
 });
