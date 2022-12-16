@@ -3,17 +3,18 @@ const express = require("express");
 const request = require("request");
 const Blockchain = require("./blockchain/blockchain");
 const PubSub = require("./app/pubsub");
+const TransactionPool = require("./wallet/transaction_pool");
+const Wallet = require("./wallet/wallet");
 
 const app = new express();
 const blockchain = new Blockchain();
-const pubsub = new PubSub(blockchain);
 const DEFAULT_PORT = 3000;
+const transactionPool = new TransactionPool();
+const wallet = new Wallet();
+
+const pubsub = new PubSub({ blockchain, transactionPool, wallet });
 
 const ROOT_NODE_ADDRESS = `http://localhost:${DEFAULT_PORT}`;
-
-// setTimeout(() => {
-//   pubsub.broadcastChain();
-// }, 1000);
 
 app.use(bodyParser.json());
 
@@ -28,7 +29,32 @@ app.post("/api/mine", (req, res) => {
   res.redirect("/api/blocks");
 });
 
-const syncChain = () => {
+app.post("/api/transact", (req, res) => {
+  const { recipient, amount } = req.body;
+
+  let transaction = transactionPool.existingTransaction({
+    inputAddress: wallet.publicKey,
+  });
+
+  try {
+    if (transaction)
+      transaction.updateTransaction({ senderWallet: wallet, amount, recipient });
+    else 
+      transaction = wallet.createTransaction({ recipient, amount });
+  } catch (error) {
+    return res.status(400).json({ type: "error", message: error.message });
+  }
+  
+  transactionPool.setTransaction(transaction);
+  pubsub.broadcastTransaction(transaction);
+  res.json({ type: "success", transaction });
+});
+
+app.get('/api/transaction-pool', (req, res) => {
+  res.json(transactionPool.transactionMap);
+});
+
+const syncWithCurrentState = () => {
   request(
     { url: `${ROOT_NODE_ADDRESS}/api/blocks` },
     (error, response, body) => {
@@ -39,6 +65,17 @@ const syncChain = () => {
       }
     }
   );
+
+  request(
+    { url: `${ROOT_NODE_ADDRESS}/api/transaction-pool` }, 
+    (error, response, body) => {
+      if(!error && response.statusCode === 200) {
+        const response_pool = JSON.parse(body);
+        console.log("Syncing with existant transaction-pool.");
+        transactionPool.setMap(response_pool);
+      }
+    }
+  )
 };
 
 let PORT = DEFAULT_PORT;
@@ -49,8 +86,5 @@ if (process.env.GENERATE_PEER_PORT === "TRUE")
 app.listen(PORT, () => {
   console.log(`listening to port-${PORT}`);
 
-  if (PORT !== DEFAULT_PORT) syncChain();
-  // setTimeout(() => {
-  //     console.log(blockchain.chain)
-  // }, 1000);
+  if (PORT !== DEFAULT_PORT) syncWithCurrentState();
 });
