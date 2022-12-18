@@ -88,13 +88,13 @@ describe("Transaction", () => {
 
     describe("amount entered exceeds the current balance", () => {
       it("throws an error", () => {
-        expect( () =>
+        expect(() =>
           transaction.updateTransaction({
             senderWallet,
-            recipient: 'kndsk',
-            amount: 999999
+            recipient: "kndsk",
+            amount: 999999,
           })
-        ).toThrow('Amount exceeds current balance!');
+        ).toThrow("Amount exceeds current balance!");
       });
     });
 
@@ -143,24 +143,28 @@ describe("Transaction", () => {
       ).toBe(true);
     });
 
-    describe('and another update for the a recipient', () => {
+    describe("and another update for the a recipient", () => {
       let addedAmount;
 
       beforeEach(() => {
         addedAmount = 80;
         transaction.updateTransaction({
-          senderWallet, recipient: newRecipient, amount: addedAmount
+          senderWallet,
+          recipient: newRecipient,
+          amount: addedAmount,
         });
       });
 
-      it('adds to the recipient amount in outputMap', () => {
-        expect(transaction.outputMap[newRecipient])
-          .toEqual(newAmount + addedAmount);
+      it("adds to the recipient amount in outputMap", () => {
+        expect(transaction.outputMap[newRecipient]).toEqual(
+          newAmount + addedAmount
+        );
       });
 
-      it('subtracts the amount from the original sender output amount', () => {
-        expect(transaction.outputMap[senderWallet.publicKey])
-          .toEqual(prevResidualBalance - newAmount - addedAmount);
+      it("subtracts the amount from the original sender output amount", () => {
+        expect(transaction.outputMap[senderWallet.publicKey]).toEqual(
+          prevResidualBalance - newAmount - addedAmount
+        );
       });
     });
   });
@@ -173,12 +177,16 @@ describe("Transaction", () => {
       rewardedTransaction = Transaction.rewardMinerTransaction({ minerWallet });
     });
 
-    it('provides the miner with correct reward amount', () => {
-      expect(rewardedTransaction.outputMap[minerWallet.publicKey]).toEqual(MINING_REWARD);
+    it("provides the miner with correct reward amount", () => {
+      expect(rewardedTransaction.outputMap[minerWallet.publicKey]).toEqual(
+        MINING_REWARD
+      );
     });
 
-    it('provides the miner the reward from correct sender', () => {
-      expect(rewardedTransaction.transactionData.address).toEqual(REWARD_DATA.address);
+    it("provides the miner the reward from correct sender", () => {
+      expect(rewardedTransaction.transactionData.address).toEqual(
+        REWARD_DATA.address
+      );
     });
   });
 });

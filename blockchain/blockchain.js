@@ -45,7 +45,8 @@ class Blockchain {
 
     if (!Blockchain.isValidChain(chain)) return;
 
-    if(validateTransactionFlag && !this.validateTransactionData({ chain })) return;
+    if (validateTransactionFlag && !this.validateTransactionData({ chain }))
+      return;
 
     if (onSuccess) onSuccess();
     this.chain = chain;
@@ -58,28 +59,23 @@ class Blockchain {
       const transactionSet = new Set();
 
       for (let transaction of block.data) {
-        if(transaction.transactionData.address === REWARD_DATA.address) {
-          if(rewardTransactionFound)
-            return false;
-          
+        if (transaction.transactionData.address === REWARD_DATA.address) {
+          if (rewardTransactionFound) return false;
+
           rewardTransactionFound = true;
-          
-          if(Object.values(transaction.outputMap)[0] !== MINING_REWARD)
+
+          if (Object.values(transaction.outputMap)[0] !== MINING_REWARD)
             return false;
-        }
-        else {
-          if(!Transaction.validateTransaction(transaction))
-            return false;
+        } else {
+          if (!Transaction.validateTransaction(transaction)) return false;
         }
 
-        if(transactionSet.has(transaction))
-          return false;
-        
+        if (transactionSet.has(transaction)) return false;
+
         transactionSet.add(transaction);
       }
 
-      if(!rewardTransactionFound)
-        return false;
+      if (!rewardTransactionFound) return false;
     }
     return true;
   }

@@ -115,14 +115,14 @@ describe("Blockchain", () => {
       });
     });
 
-    describe('the validTransactionFalg is true', () => {
-      it('calls the validTransactionData function', () => {
+    describe("the validTransactionFalg is true", () => {
+      it("calls the validTransactionData function", () => {
         validateTransactionDataMock = jest.fn();
         blockchain.validateTransactionData = validateTransactionDataMock;
 
-        newChain.addBlock({ data: 'dummy' });
+        newChain.addBlock({ data: "dummy" });
         blockchain.updateChain(newChain.chain, true);
-        
+
         expect(validateTransactionDataMock).toHaveBeenCalled();
       });
     });
@@ -191,14 +191,20 @@ describe("Blockchain", () => {
           // console.log(transaction.transactionData.timestamp);
           transaction.transactionData.address = new Wallet().publicKey;
           newChain.addBlock({ data: [transaction, rewardTransaction] });
-          expect(blockchain.validateTransactionData({ chain: newChain.chain })).toBe(false);
+          expect(
+            blockchain.validateTransactionData({ chain: newChain.chain })
+          ).toBe(false);
         });
       });
 
       describe("contains multiple identical transactions", () => {
         it("returns false", () => {
-          newChain.addBlock({ data: [transaction, rewardTransaction, transaction] });
-          expect(blockchain.validateTransactionData({ chain: newChain.chain })).toBe(false);
+          newChain.addBlock({
+            data: [transaction, rewardTransaction, transaction],
+          });
+          expect(
+            blockchain.validateTransactionData({ chain: newChain.chain })
+          ).toBe(false);
         });
       });
     });

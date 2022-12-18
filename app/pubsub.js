@@ -3,13 +3,13 @@ const PubNub = require("pubnub");
 const credentials = {
   publishKey: "pub-c-b26cbef7-3f83-46ee-8dde-a2d5db1a0b67",
   subscribeKey: "sub-c-58859ffe-cbf7-47c3-a685-6a69b2fbefd2",
-  secretKey: "sec-c-MjUwY2EyZGEtYjk3OS00ZTYzLTg3NGUtMTc4NzIyMzIyMjA5"
+  secretKey: "sec-c-MjUwY2EyZGEtYjk3OS00ZTYzLTg3NGUtMTc4NzIyMzIyMjA5",
 };
 
 const CHANNELS = {
   TEST: "TEST-CHANNEL",
   BLOCKCHAIN: "BLOCKCHAIN-CHANNEL",
-  TRANSACTION: "TRANSACTION-CHANNEL"
+  TRANSACTION: "TRANSACTION-CHANNEL",
 };
 
 class PubSub {
@@ -32,21 +32,23 @@ class PubSub {
         );
 
         const parsedMsg = JSON.parse(message);
-        
-        switch(channel){
+
+        switch (channel) {
           case CHANNELS.BLOCKCHAIN:
             this.blockchain.updateChain(parsedMsg, true, () => {
-              this.transactionPool.clearBlockchainTransactions({ chain: parsedMsg });
+              this.transactionPool.clearBlockchainTransactions({
+                chain: parsedMsg,
+              });
             });
             break;
           case CHANNELS.TRANSACTION:
-            if(this.wallet.publicKey !== parsedMsg.transactionData.address)
+            if (this.wallet.publicKey !== parsedMsg.transactionData.address)
               this.transactionPool.setTransaction(parsedMsg);
-            break;  
+            break;
           default:
-            break;          
+            break;
         }
-      }
+      },
     };
   }
 
@@ -64,7 +66,7 @@ class PubSub {
   broadcastTransaction(transaction) {
     this.publish({
       channel: CHANNELS.TRANSACTION,
-      message: JSON.stringify(transaction)
+      message: JSON.stringify(transaction),
     });
   }
 }

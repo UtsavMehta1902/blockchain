@@ -28,23 +28,21 @@ class Wallet {
   }
 
   static calculateBalance({ chain, address }) {
-    let outputsTotal = 0, isSender = false;
+    let outputsTotal = 0,
+      isSender = false;
 
-    for (let i = chain.length-1; i > 0; i--) {
+    for (let i = chain.length - 1; i > 0; i--) {
       const block = chain[i];
 
       for (let transaction of block.data) {
-        if(transaction.transactionData.address === address)
-          isSender = true;
+        if (transaction.transactionData.address === address) isSender = true;
 
         const addressOutput = transaction.outputMap[address];
 
-        if (addressOutput)
-          outputsTotal += addressOutput;
+        if (addressOutput) outputsTotal += addressOutput;
       }
 
-      if(isSender)
-        break;
+      if (isSender) break;
     }
 
     return isSender ? outputsTotal : INIT_BALANCE + outputsTotal;

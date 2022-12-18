@@ -40,33 +40,42 @@ app.post("/api/transact", (req, res) => {
 
   try {
     if (transaction)
-      transaction.updateTransaction({ senderWallet: wallet, amount, recipient });
-    else 
-      transaction = wallet.createTransaction({ recipient, amount, chain: blockchain.chain });
+      transaction.updateTransaction({
+        senderWallet: wallet,
+        amount,
+        recipient,
+      });
+    else
+      transaction = wallet.createTransaction({
+        recipient,
+        amount,
+        chain: blockchain.chain,
+      });
   } catch (error) {
     return res.status(400).json({ type: "error", message: error.message });
   }
-  
+
   transactionPool.setTransaction(transaction);
   pubsub.broadcastTransaction(transaction);
   res.json({ type: "success", transaction });
 });
 
-app.get('/api/transaction-pool', (req, res) => {
+app.get("/api/transaction-pool", (req, res) => {
   res.json(transactionPool.transactionMap);
 });
 
-app.get('/api/mine-transactions', (req, res) => {
+app.get("/api/mine-transactions", (req, res) => {
   miner.mine();
 
-  res.redirect('/api/blocks');
+  res.redirect("/api/blocks");
 });
 
-app.get('/api/wallet-info', (req, res) => {
+app.get("/api/wallet-info", (req, res) => {
   const address = wallet.publicKey;
 
   res.json({
-    address, balance: Wallet.calculateBalance({ chain: blockchain.chain, address })
+    address,
+    balance: Wallet.calculateBalance({ chain: blockchain.chain, address }),
   });
 });
 
@@ -83,15 +92,15 @@ const syncWithCurrentState = () => {
   );
 
   request(
-    { url: `${ROOT_NODE_ADDRESS}/api/transaction-pool` }, 
+    { url: `${ROOT_NODE_ADDRESS}/api/transaction-pool` },
     (error, response, body) => {
-      if(!error && response.statusCode === 200) {
+      if (!error && response.statusCode === 200) {
         const response_pool = JSON.parse(body);
         console.log("Syncing with existant transaction-pool.");
         transactionPool.setMap(response_pool);
       }
     }
-  )
+  );
 };
 
 let PORT = DEFAULT_PORT;

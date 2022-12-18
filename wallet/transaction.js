@@ -5,12 +5,15 @@ const { MINING_REWARD, REWARD_DATA } = require("../config");
 class Transaction {
   constructor({ senderWallet, amount, recipient, outputMap, transactionData }) {
     this.id = UUID();
-    this.outputMap = outputMap || this.outputMapGenerator({
-      senderWallet,
-      amount,
-      recipient,
-    });
-    this.transactionData = transactionData || this.transactionDataGenerator({ senderWallet });
+    this.outputMap =
+      outputMap ||
+      this.outputMapGenerator({
+        senderWallet,
+        amount,
+        recipient,
+      });
+    this.transactionData =
+      transactionData || this.transactionDataGenerator({ senderWallet });
   }
 
   outputMapGenerator({ senderWallet, amount, recipient }) {
@@ -34,11 +37,9 @@ class Transaction {
     if (amount > this.outputMap[senderWallet.publicKey])
       throw new Error("Amount exceeds current balance!");
 
-    if(this.outputMap[recipient])
-      this.outputMap[recipient] += amount;
-    else
-      this.outputMap[recipient] = amount;
-      
+    if (this.outputMap[recipient]) this.outputMap[recipient] += amount;
+    else this.outputMap[recipient] = amount;
+
     this.outputMap[senderWallet.publicKey] -= amount;
     this.transactionData = this.transactionDataGenerator({ senderWallet });
   }
@@ -67,7 +68,7 @@ class Transaction {
   static rewardMinerTransaction({ minerWallet }) {
     return new this({
       outputMap: { [minerWallet.publicKey]: MINING_REWARD },
-      transactionData: { address: REWARD_DATA.address }
+      transactionData: { address: REWARD_DATA.address },
     });
   }
 }
