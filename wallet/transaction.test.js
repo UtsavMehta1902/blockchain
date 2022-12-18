@@ -1,6 +1,7 @@
 const { verifySignature } = require("../util/keys");
 const Transaction = require("./transaction");
 const Wallet = require("./wallet");
+const { MINING_REWARD, REWARD_DATA } = require("../config");
 
 describe("Transaction", () => {
   let transaction, amount, recipient, senderWallet;
@@ -161,6 +162,23 @@ describe("Transaction", () => {
         expect(transaction.outputMap[senderWallet.publicKey])
           .toEqual(prevResidualBalance - newAmount - addedAmount);
       });
+    });
+  });
+
+  describe("rewardMinerTransaction()", () => {
+    let rewardedTransaction, minerWallet;
+
+    beforeEach(() => {
+      minerWallet = new Wallet();
+      rewardedTransaction = Transaction.rewardMinerTransaction({ minerWallet });
+    });
+
+    it('provides the miner with correct reward amount', () => {
+      expect(rewardedTransaction.outputMap[minerWallet.publicKey]).toEqual(MINING_REWARD);
+    });
+
+    it('provides the miner the reward from correct sender', () => {
+      expect(rewardedTransaction.transactionData.address).toEqual(REWARD_DATA.address);
     });
   });
 });

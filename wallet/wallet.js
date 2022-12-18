@@ -14,12 +14,40 @@ class Wallet {
     return this.keyPair.sign(cryptoHash(data));
   }
 
-  createTransaction({ amount, recipient }) {
+  createTransaction({ amount, recipient, chain }) {
+    if (chain)
+      this.balance = Wallet.calculateBalance({
+        chain,
+        address: this.publicKey,
+      });
     if (amount > this.balance) {
       throw new Error("Amount greater than balance!");
     }
 
     return new Transaction({ senderWallet: this, amount, recipient });
+  }
+
+  static calculateBalance({ chain, address }) {
+    let outputsTotal = 0, isSender = false;
+
+    for (let i = chain.length-1; i > 0; i--) {
+      const block = chain[i];
+
+      for (let transaction of block.data) {
+        if(transaction.transactionData.address === address)
+          isSender = true;
+
+        const addressOutput = transaction.outputMap[address];
+
+        if (addressOutput)
+          outputsTotal += addressOutput;
+      }
+
+      if(isSender)
+        break;
+    }
+
+    return isSender ? outputsTotal : INIT_BALANCE + outputsTotal;
   }
 }
 

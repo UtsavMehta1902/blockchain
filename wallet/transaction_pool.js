@@ -1,21 +1,51 @@
+const Transaction = require("./transaction");
+
 class TransactionPool {
-    constructor() {
-        this.transactionMap = {};
-    }
-    
-    setTransaction(transaction) {
-        this.transactionMap[transaction.id] = transaction;
-    }
+  constructor() {
+    this.transactionMap = {};
+  }
 
-    setMap(transactionPoolMap) {
-        this.transactionMap = transactionPoolMap;
-    }
+  setTransaction(transaction) {
+    this.transactionMap[transaction.id] = transaction;
+  }
 
-    existingTransaction({ inputAddress }) {
-        const transactions = Object.values(this.transactionMap);
+  setMap(transactionPoolMap) {
+    this.transactionMap = transactionPoolMap;
+  }
 
-        return transactions.find(transaction => transaction.transactionData.address === inputAddress);
+  existingTransaction({ inputAddress }) {
+    const transactions = Object.values(this.transactionMap);
+
+    return transactions.find(
+      (transaction) => transaction.transactionData.address === inputAddress
+    );
+  }
+
+  validTransactions() {
+    const valid_transactions = [];
+
+    Object.values(this.transactionMap).map((transaction, idx) => {
+      if (Transaction.validateTransaction(transaction))
+        valid_transactions.push(transaction);
+    });
+
+    return valid_transactions;
+  }
+
+  clearPool() {
+    this.transactionMap = {};
+  }
+
+  clearBlockchainTransactions({ chain }) {
+    for(let i=0; i<chain.length; ++i) {
+        const block = chain[i];
+
+        for(let transaction of block.data) {
+            if(this.transactionMap[transaction.id])
+                delete this.transactionMap[transaction.id];
+        }
     }
+  }
 }
 
 module.exports = TransactionPool;

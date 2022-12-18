@@ -1,5 +1,7 @@
 const Block = require("./block");
 const cryptoHash = require("../util/crypto_hash");
+const { REWARD_DATA, MINING_REWARD } = require("../config");
+const Transaction = require("../wallet/transaction");
 
 class Blockchain {
   constructor() {
@@ -38,12 +40,48 @@ class Blockchain {
     return true;
   }
 
-  updateChain(chain) {
+  updateChain(chain, validateTransactionFlag, onSuccess) {
     if (chain.length <= this.chain.length) return;
 
     if (!Blockchain.isValidChain(chain)) return;
 
+    if(validateTransactionFlag && !this.validateTransactionData({ chain })) return;
+
+    if (onSuccess) onSuccess();
     this.chain = chain;
+  }
+
+  validateTransactionData({ chain }) {
+    for (let i = 1; i < chain.length; ++i) {
+      const block = chain[i];
+      let rewardTransactionFound = false;
+      const transactionSet = new Set();
+
+      for (let transaction of block.data) {
+        if(transaction.transactionData.address === REWARD_DATA.address) {
+          if(rewardTransactionFound)
+            return false;
+          
+          rewardTransactionFound = true;
+          
+          if(Object.values(transaction.outputMap)[0] !== MINING_REWARD)
+            return false;
+        }
+        else {
+          if(!Transaction.validateTransaction(transaction))
+            return false;
+        }
+
+        if(transactionSet.has(transaction))
+          return false;
+        
+        transactionSet.add(transaction);
+      }
+
+      if(!rewardTransactionFound)
+        return false;
+    }
+    return true;
   }
 }
 
