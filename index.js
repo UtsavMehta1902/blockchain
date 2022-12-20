@@ -6,6 +6,7 @@ const PubSub = require("./app/pubsub");
 const TransactionPool = require("./wallet/transaction_pool");
 const Wallet = require("./wallet/wallet");
 const Miner = require("./app/miner");
+const path = require("path");
 
 const app = new express();
 const blockchain = new Blockchain();
@@ -19,6 +20,7 @@ const miner = new Miner({ blockchain, transactionPool, wallet, pubsub });
 const ROOT_NODE_ADDRESS = `http://localhost:${DEFAULT_PORT}`;
 
 app.use(bodyParser.json());
+app.use(express.static(path.join(__dirname, 'client/dist')));
 
 app.get("/api/blocks", (req, res) => {
   res.json(blockchain.chain);
@@ -95,13 +97,58 @@ const syncWithCurrentState = () => {
     { url: `${ROOT_NODE_ADDRESS}/api/transaction-pool` },
     (error, response, body) => {
       if (!error && response.statusCode === 200) {
-        const response_pool = JSON.parse(body);
+        // const response_pool = JSON.parse(body);
         console.log("Syncing with existant transaction-pool.");
         transactionPool.setMap(response_pool);
       }
     }
   );
 };
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'client/dist/index.html'));
+});
+
+const wallet_temp1 = new Wallet();
+const wallet_temp2 = new Wallet();
+
+const generateTransaction = ({wallet, recipient, amount}) => {
+  const transaction = wallet.createTransaction({ amount, recipient, chain: blockchain.chain });
+
+  transactionPool.setTransaction(transaction);
+}
+
+const transWallet = () => generateTransaction({
+  wallet, recipient: wallet_temp1.publicKey, amount: 10
+});
+
+const transWallet1 = () => generateTransaction({
+  wallet: wallet_temp1, recipient: wallet_temp2, amount: 21 
+});
+
+const transWallet2 = () => generateTransaction({
+  wallet: wallet_temp2, recipient: wallet, amount: 13
+});
+
+for(let i=0; i<10; ++i)
+{
+  if(i%3 === 0){
+    transWallet();
+    transWallet1();
+  }
+  else if(i%3 === 1)
+  {
+    transWallet1();
+    transWallet2();
+  }
+  else
+  {
+    transWallet();
+    transWallet2();
+  }
+
+  miner.mine();
+}
 
 let PORT = DEFAULT_PORT;
 
