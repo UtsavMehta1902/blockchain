@@ -52,13 +52,11 @@ class Transaction {
 
     if (!verifySignature({ publicKey: address, data: outputMap, signature }))
       return false;
-
     const totalAmount = Object.values(outputMap).reduce(
       (total, value) => total + value
     );
-
+    
     if (amount != totalAmount) {
-      //   console.log(amount);
       return false;
     }
 

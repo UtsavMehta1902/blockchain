@@ -24,7 +24,7 @@ class TransactionPool {
   validTransactions() {
     const valid_transactions = [];
 
-    Object.values(this.transactionMap).map((transaction, idx) => {
+    Object.values(this.transactionMap).map(transaction => {
       if (Transaction.validateTransaction(transaction))
         valid_transactions.push(transaction);
     });

@@ -1,35 +1,25 @@
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import Block from "./Block";
 
 const Blocks = () => {
   const [blocks, setBlocks] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:3000/api/blocks", {
+    fetch(`${document.location.origin}/api/blocks`, {
       method: "GET",
     })
       .then((res) => res.json())
       .then((json) => setBlocks(json));
   }, []);
 
-  console.log(blocks);
-
   return (
     <div>
+      <div><Link to='/'>Home</Link></div>
       <h3>Blocks</h3>
-
-      {blocks.map((block, index) => {
-        return (
-          <a key={index} url="">
-            <tr>
-              <td>{index}</td>
-              <td>{new Date(block.timestamp).toLocaleDateString()}</td>
-              <td>
-                {block.hash.substring(0, Math.min(10, block.hash.length))}...
-              </td>
-            </tr>
-          </a>
-        );
-      })}
+      {blocks.map((block) => (
+        <Block block={block} />
+      ))}
     </div>
   );
 };

@@ -10,7 +10,6 @@ class Miner {
 
   mine() {
     const validTransactions = this.transactionPool.validTransactions();
-
     validTransactions.push(
       Transaction.rewardMinerTransaction({ minerWallet: this.wallet })
     );

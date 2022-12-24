@@ -97,7 +97,7 @@ const syncWithCurrentState = () => {
     { url: `${ROOT_NODE_ADDRESS}/api/transaction-pool` },
     (error, response, body) => {
       if (!error && response.statusCode === 200) {
-        // const response_pool = JSON.parse(body);
+        const response_pool = JSON.parse(body);
         console.log("Syncing with existant transaction-pool.");
         transactionPool.setMap(response_pool);
       }
