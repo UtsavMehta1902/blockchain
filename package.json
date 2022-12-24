@@ -2,15 +2,14 @@
   "name": "blockchain",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
   "scripts": {
     "test": "jest --watchAll",
-    "start": "npm run build-client && node index.js",
+    "start": "npm run build-client & node index.js",
     "dev-b": "nodemon index.js",
     "dev-peer": "cross-env GENERATE_PEER_PORT='TRUE' nodemon index.js",
-    "build-client": "parcel build client/src/index.html --dist-dir client/dist",
+    "build-client": "npm run clean && parcel build client/src/index.html --dist-dir client/dist",
     "dev-f": "npm run clean && parcel client/src/index.html --dist-dir client/dist",
-    "clean": "rm -rf client\\dist .cache"
+    "clean": "rm -rf client/dist .cache"
   },
   "keywords": [],
   "author": "",
