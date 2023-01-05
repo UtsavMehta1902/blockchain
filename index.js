@@ -105,11 +105,6 @@ const syncWithCurrentState = () => {
   );
 };
 
-app.get('/', (req, res) => {
-  res.sendStatus(200);
-  res.sendFile(path.join(__dirname, 'client/dist/index.html'));
-});
-
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'client/dist/index.html'));
 });
