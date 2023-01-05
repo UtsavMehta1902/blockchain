@@ -105,6 +105,10 @@ const syncWithCurrentState = () => {
   );
 };
 
+app.get('/', (req, res) => {
+  res.sendStatus(200);
+});
+
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'client/dist/index.html'));
 });
@@ -150,7 +154,7 @@ for(let i=0; i<10; ++i)
   miner.mine();
 }
 
-let PORT = DEFAULT_PORT;
+let PORT = process.env.PORT || DEFAULT_PORT;
 
 if (process.env.GENERATE_PEER_PORT === "TRUE")
   PORT = DEFAULT_PORT + Math.ceil(Math.random() * 1000);
