@@ -107,52 +107,53 @@ const syncWithCurrentState = () => {
 
 app.get('/', (req, res) => {
   res.sendStatus(200);
+  res.sendFile(path.join(__dirname, 'client/dist/index.html'));
 });
 
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'client/dist/index.html'));
 });
 
-const wallet_temp1 = new Wallet();
-const wallet_temp2 = new Wallet();
+// const wallet_temp1 = new Wallet();
+// const wallet_temp2 = new Wallet();
 
-const generateTransaction = ({wallet, recipient, amount}) => {
-  const transaction = wallet.createTransaction({ amount, recipient, chain: blockchain.chain });
+// const generateTransaction = ({wallet, recipient, amount}) => {
+//   const transaction = wallet.createTransaction({ amount, recipient, chain: blockchain.chain });
 
-  transactionPool.setTransaction(transaction);
-}
+//   transactionPool.setTransaction(transaction);
+// }
 
-const transWallet = () => generateTransaction({
-  wallet, recipient: wallet_temp1.publicKey, amount: 10
-});
+// const transWallet = () => generateTransaction({
+//   wallet, recipient: wallet_temp1.publicKey, amount: 10
+// });
 
-const transWallet1 = () => generateTransaction({
-  wallet: wallet_temp1, recipient: wallet_temp2, amount: 21 
-});
+// const transWallet1 = () => generateTransaction({
+//   wallet: wallet_temp1, recipient: wallet_temp2, amount: 21 
+// });
 
-const transWallet2 = () => generateTransaction({
-  wallet: wallet_temp2, recipient: wallet, amount: 13
-});
+// const transWallet2 = () => generateTransaction({
+//   wallet: wallet_temp2, recipient: wallet, amount: 13
+// });
 
-for(let i=0; i<10; ++i)
-{
-  if(i%3 === 0){
-    transWallet();
-    transWallet1();
-  }
-  else if(i%3 === 1)
-  {
-    transWallet1();
-    transWallet2();
-  }
-  else
-  {
-    transWallet();
-    transWallet2();
-  }
+// for(let i=0; i<10; ++i)
+// {
+//   if(i%3 === 0){
+//     transWallet();
+//     transWallet1();
+//   }
+//   else if(i%3 === 1)
+//   {
+//     transWallet1();
+//     transWallet2();
+//   }
+//   else
+//   {
+//     transWallet();
+//     transWallet2();
+//   }
 
-  miner.mine();
-}
+//   miner.mine();
+// }
 
 let PORT = process.env.PORT || DEFAULT_PORT;
 
