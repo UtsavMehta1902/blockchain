@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FormGroup, FormControl, Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import history from "../history.js";
@@ -8,6 +8,14 @@ const ConductTransaction = () => {
     recipient: "",
     amount: 0,
   });
+
+  const [knownAddresses, setKnownAddresses] = useState([]);
+
+  useEffect(() => {
+    fetch(`${document.location.origin}/api/known-addresses`)
+      .then((res) => res.json())
+      .then((json) => setKnownAddresses(json));
+  }, []);
 
   const updateAmount = (event) => {
     setTransactInfo({
@@ -43,6 +51,16 @@ const ConductTransaction = () => {
     <div className="conduct-transaction">
       <Link to="/">Home</Link>
       <h3>Conduct a Transaction</h3>
+      <br />
+      <h4>Known Addresses</h4>
+      {knownAddresses.map((knownAddress) => {
+        return (
+          <div key={knownAddress}>
+            <div>{knownAddress}</div>
+            <br />
+          </div>
+        );
+      })}
       <FormGroup>
         <FormControl
           input="text"

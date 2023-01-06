@@ -6,7 +6,7 @@ const App = () => {
   const [walletInfo, setWalletInfo] = useState({ balance: 0, address: "-" });
 
   useEffect(() => {
-    fetch("https://cryptowallet-6ijl.onrender.com/api/wallet-info", {
+    fetch(`${document.location.origin}/api/wallet-info`, {
       method: "GET",
     })
       .then((res) => res.json())
